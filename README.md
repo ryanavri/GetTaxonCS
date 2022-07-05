@@ -14,3 +14,6 @@ The code returns a data frame with the following columns: Order, Family, Species
   2. Register and create a token for CITES in here https://api.speciesplus.net/documentation
 
 The api key in this code is just an example and not gonna works, so please register and replace with your own token
+
+## Limitation
+If the result data frame produce NA`s does not mean the species are not in IUCN or CITES list, there are possibility the name was difference with database (synonym scientific name)
