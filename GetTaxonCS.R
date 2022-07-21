@@ -40,8 +40,8 @@ retrieve_IUCN_data <- function(speciesList){
       IUCN_status_sp <- data.frame(Species = UICN_search$result$scientific_name, 
                                    Status = UICN_search$result$category, 
                                    Trend = UICN_search$result$population_trend,
-                                   Order = UICN_search$result$family,
-                                   Family = UICN_search$result$order,
+                                   Order = UICN_search$result$order,
+                                   Family = UICN_search$result$family,
                                    stringsAsFactors=FALSE)
       IUCN_status <- rbind(IUCN_status, IUCN_status_sp)
     }
