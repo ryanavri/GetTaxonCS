@@ -17,4 +17,4 @@ The api key in this code is just an example and not gonna works, so please regis
 
 ## Limitation
 1. The code only works up to species level.
-2. If the result produce NA`s, does not mean the species are not in IUCN or CITES list, there are possibility the name was difference with database (synonym scientific name)
+2. If the result produce NA`s, does not mean the species are not in IUCN or CITES list, there are possibility the input name for species was different with database (synonym scientific name). It is usually happen for birds and plants.
