@@ -1,7 +1,8 @@
 cff-version: 1.2.0
 title: GetTaxonCS
 message: >-
-  If you use this code, please cite it using the metadata from this file.
+  If you use this code, please cite it using the metadata
+  from this file.
 type: software-code
 authors:
   - given-names: Ryan
@@ -13,3 +14,6 @@ authors:
   - given-names: Yogi
     family-names: Satrio
   - given-names: Dwiyanto
+  - given-names: Zana Pandya
+    family-names: Pratisara
+repository-code: 'https://github.com/ryanavri/GetTaxonCS'
