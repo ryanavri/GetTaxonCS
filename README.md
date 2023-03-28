@@ -7,7 +7,7 @@ Get taxonomic and conservation status (GetTaxonCS) is a code to get conservation
 
 The code generates a data frame with detailed information about taxonomy and conservation status, which includes columns such as Class, Order, Family, Species, Conservation Status, and Population trend from the IUCN database, appendix information from the CITES database, as well as protected species from the regulations of the Ministry of Environment and Forestry (MoEF). For more information about protected species, please refer to the [Buku Panduan Identifikasi Satwa Liar Dilindungi](https://kukangku.id/identifikasi-satwa-dilindungi/)
 
-[The code](https://github.com/ryanavri/GetTaxonCS/blob/main/GetTaxonCS.R) itself was inspired by [bienflorencia/rBiodiversidata](https://github.com/bienflorencia/rBiodiversidata)and requires the use of two functions: rl_search() from the [**rredlist**](https://CRAN.R-project.org/package=rredlist) package and `spp_taxonconcept()` from the [**rcites**](https://cran.r-project.org/web/packages/rcites) package. It's important to note that both functions require an API key to function properly..
+[The code](https://github.com/ryanavri/GetTaxonCS/blob/main/GetTaxonCS.R) itself was inspired by [bienflorencia/rBiodiversidata](https://github.com/bienflorencia/rBiodiversidata)and requires the use of two functions: `rl_search()` from the [**rredlist**](https://CRAN.R-project.org/package=rredlist) package and `spp_taxonconcept()` from the [**rcites**](https://cran.r-project.org/web/packages/rcites) package. It's important to note that both functions require an API key to function properly..
 
 - To use the API:
   1. Register and create an IUCN token at http://apiv3.iucnredlist.org/api/v3/token
