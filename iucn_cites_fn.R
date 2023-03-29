@@ -52,5 +52,5 @@ retrieve_CITES_data <- function(speciesList){
   return(CITES_status)
 }
 
-urlfile<-'https://raw.githubusercontent.com/ryanavri/GetTaxonCS/main/ProtectedSpecies_by_GOI.csv'
+urlfile<-'https://raw.githubusercontent.com/ryanavri/GetTaxonCS/main/PSG_v2.csv'
 db <- read.csv(urlfile)
