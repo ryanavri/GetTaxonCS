@@ -52,5 +52,6 @@ retrieve_CITES_data <- function(speciesList){
   return(CITES_status)
 }
 
-urlfile<-'https://raw.githubusercontent.com/ryanavri/GetTaxonCS/main/PSG_v2.csv'
+#load database for Indonesian protected species
+urlfile<-'https://raw.githubusercontent.com/ryanavri/GetTaxonCS/main/PSG_v3.csv'
 db <- read.csv(urlfile)
