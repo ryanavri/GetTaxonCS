@@ -29,17 +29,30 @@ Species_df <- data.frame(Species)
 sp1 <- retrieve_IUCN_data(Species_df$Species)
 
 # retrieve CITES data
-sp2 <- retrieve_CITES_data(Species_df$Species)
+sp2 <- retrieve_CITES_data(Species_df$Species) %>%
+  distinct(Species, .keep_all = TRUE)
 
-# retrieve CITES legislation
-sp3 <- spp_cites_legislation(taxon_id = sp2$taxon_id, verbose = FALSE)
-sp3 <- as.data.frame (sp3[["cites_listings"]])
-
-# Merge information from IUCN, CITES and Protected Species by GOI
-species_list <- left_join(sp1, sp2, by='Species') %>%
-  left_join(., sp3, by='taxon_id') %>%
-  left_join(., db,  by="Species") %>%
-  select(Class, Order, Family, Species, Status, Trend, appendix, Protected, Endemic, Migratory) %>%
-  mutate_at(vars(Class, Order, Family),tolower) %>%
-  mutate_at(vars(Class, Order, Family),str_to_title) %>%
-  rename(Appendix = appendix)
+# Check if sp2 'taxon_id' column contains only the string "NA"
+if (all(sp2$taxon_id == "NA")) {
+  # Proceed without sp2 and sp3 data
+  result <- left_join(sp1, db, by = "Species") %>%
+    select(Class, Order, Family, Species, Status, Trend, Protected, Endemic, Migratory) %>%
+    mutate(across(c(Class, Order, Family), tolower)) %>%
+    mutate(across(c(Class, Order, Family), tools::toTitleCase)) %>%
+    arrange(Order, Family, Species)
+} else {
+  # Proceed with additional data processing involving sp2 and sp3
+  sp3 <- spp_cites_legislation(taxon_id = sp2$taxon_id, verbose = FALSE)
+  sp3 <- as.data.frame (sp3[["cites_listings"]])
+  sp3 <- sp3 %>%
+    distinct(taxon_id, .keep_all = TRUE)
+  
+  result <- left_join(sp1, sp2, by='Species') %>%
+    left_join(., sp3, by='taxon_id') %>%
+    left_join(., db, by="Species") %>%
+    select(Class, Order, Family, Species, Status, Trend, appendix, Protected, Endemic, Migratory) %>%
+    mutate(across(c(Class, Order, Family), tolower)) %>%
+    mutate(across(c(Class, Order, Family), tools::toTitleCase)) %>%
+    rename(Appendix = appendix) %>%
+    arrange(Order, Family, Species)
+}
