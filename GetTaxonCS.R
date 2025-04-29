@@ -1,42 +1,50 @@
 # Preparation----
-# load library
+
+## Load library----
 library(tidyverse)
-library(rredlist)
+library(iucnredlist)
 library(rcites)
+library(purrr)
 
 # load example of species list
 urlfile1<-'https://raw.githubusercontent.com/ryanavri/GetTaxonCS/main/sp_list.csv'
-sp_list <- read.csv(urlfile1)
+Species_df <- read.csv(urlfile1)
 
-# set token from CITES
-set_token("3yTXsqrceqKHF") #WARNING! this is just an example, use your own token
+Species_df <- Species_df %>%
+  mutate(
+    genus = word(Species, 1),
+    species = word(Species, 2))
 
-# set token from IUCN
-Sys.setenv(IUCN_KEY = "qNdBxkZRQi5V54ZYyauKacIzT7csLlUaVxi") #WARNING! this is just an example, use your own token
-apikey <- Sys.getenv("IUCN_KEY")
+# Check the structure, you need to have three columns as example below
+glimpse(Species_df)
 
-# download the function
+## Set up your token----
+
+# IUCN
+api <- init_api("T3SzxqvSwGgAQjfGuWK8tWVaNq361o1dcSoT") #WARNING! this is just an example, use your own token
+
+# CITES
+set_token("kUydW4HMDXY9AvDFSThxMwtt") #WARNING! this is just an example, use your own token
+
+# Run the function----
+
+## Download the function----
 devtools::source_url("https://raw.githubusercontent.com/ryanavri/GetTaxonCS/main/iucn_cites_fn.R")
 
-# Get unique species from a species list
-Species <- unique(sp_list$Species)
+## Produce dataframe with IUCN and CITES status----
 
-# Create a data frame with 'Species' as the header
-Species_df <- data.frame(Species)
+## Retrieve IUCN data----
+sp1 <- get_iucn_species_data(api, Species_df)
 
-# Produce dataframe with IUCN and CITES status----
-# retrieve IUCN data
-sp1 <- retrieve_IUCN_data(Species_df$Species)
-
-# retrieve CITES data
+## Retrieve CITES data----
 sp2 <- retrieve_CITES_data(Species_df$Species) %>%
   distinct(Species, .keep_all = TRUE)
 
-# Check if sp2 'taxon_id' column contains only the string "NA"
+## Combine IUCN, CITES and PP106----
 if (all(sp2$taxon_id == "NA")) {
   # Proceed without sp2 and sp3 data
   result <- left_join(sp1, db, by = "Species") %>%
-    select(Class, Order, Family, Species, Status, Trend, Protected, Endemic, Migratory) %>%
+    select(Class, Order, Family, Species, `Common name`, Status, Protected, Endemic, Migratory) %>%
     mutate(across(c(Class, Order, Family), tolower)) %>%
     mutate(across(c(Class, Order, Family), tools::toTitleCase)) %>%
     arrange(Order, Family, Species)
@@ -50,7 +58,7 @@ if (all(sp2$taxon_id == "NA")) {
   result <- left_join(sp1, sp2, by='Species') %>%
     left_join(., sp3, by='taxon_id') %>%
     left_join(., db, by="Species") %>%
-    select(Class, Order, Family, Species, Status, Trend, appendix, Protected, Endemic, Migratory) %>%
+    select(Class, Order, Family, Species, `Common name`, Status, appendix, Protected, Endemic, Migratory) %>%
     mutate(across(c(Class, Order, Family), tolower)) %>%
     mutate(across(c(Class, Order, Family), tools::toTitleCase)) %>%
     rename(Appendix = appendix) %>%
