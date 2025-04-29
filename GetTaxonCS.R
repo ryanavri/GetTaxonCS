@@ -21,10 +21,10 @@ glimpse(Species_df)
 ## Set up your token----
 
 # IUCN
-api <- init_api("T3SzxqvSwGgAQjfGuWK8tWVaNq361o1dcSoT") #WARNING! this is just an example, use your own token
+api <- init_api("T3SzxqvSwGgAQjfGuWKas6d51as5d11o1dcSoT") #WARNING! this is just an example, use your own token
 
 # CITES
-set_token("kUydW4HMDXY9AvDFSThxMwtt") #WARNING! this is just an example, use your own token
+set_token("kUydW4HMDada1d651hxMwtt") #WARNING! this is just an example, use your own token
 
 # Run the function----
 
