@@ -44,24 +44,26 @@ get_iucn_species_data <- function(api, species_df, wait_time = 0.5) {
 
 # CITES 
 retrieve_CITES_data <- function(speciesList) {
-  # Helper function to process one species
+  
   get_cites_status <- function(sp) {
-    CITES_search <- spp_taxonconcept(query_taxon = sp)
     
-    if (length(CITES_search$all_id) == 0) {
-      message(sp, " ----- CHECK (not found)")
-      tibble(Species = sp, taxon_id = NA_character_)
+    res <- spp_taxonconcept(query_taxon = sp, raw = TRUE)
+    
+    if (length(res) == 0 || is.null(res[[1]]$cites_listing)) {
+      message(sp, " ----- CHECK (not found or no CITES listing)")
+      tibble(Species = sp, CITES_Appendix = NA_character_)
+      
     } else {
-      tibble(Species = CITES_search$all_id$full_name, 
-             taxon_id = CITES_search$all_id$id)
+      tibble(
+        Species = res[[1]]$full_name,
+        CITES_Appendix = res[[1]]$cites_listing
+      )
     }
   }
   
-  # Apply the helper to all species
-  CITES_status <- map_dfr(speciesList, get_cites_status)
-  
-  return(CITES_status)
+  purrr::map_dfr(speciesList, get_cites_status)
 }
+
 
 #load database for Indonesian protected species
 urlfile<-'https://raw.githubusercontent.com/ryanavri/GetTaxonCS/main/PSG_v3.csv'
