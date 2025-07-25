@@ -41,7 +41,6 @@ sp2 <- retrieve_CITES_data(Species_df$Species) %>%
   distinct(Species, .keep_all = TRUE)
 
 ## Combine IUCN, CITES and PP106----
-## Combine IUCN, CITES and PP106----
 result <- left_join(sp1, sp2, by='Species') %>%
   left_join(., db, by="Species") %>%
   select(Class, Order, Family, Species, `Common name`, Status, CITES_Appendix, Protected, Endemic, Migratory) %>%
