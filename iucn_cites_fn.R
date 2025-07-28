@@ -3,25 +3,52 @@
 #IUCN 
 get_iucn_species_data <- function(api, species_df, wait_time = 0.5) {
   
-  # Download IUCN assessments
-  iucn_as <- map2_dfr(
-    species_df$genus,
-    species_df$species,
-    ~ assessments_by_name(api, genus = .x, species = .y)
+  # Safely wrap assessments_by_name
+  safe_assessments <- safely(function(genus, species) {
+    assessments_by_name(api, genus = genus, species = species)
+  }, otherwise = NULL)
+  
+  # Safely get assessments
+  iucn_as_list <- pmap(
+    list(species_df$genus, species_df$species),
+    ~ {
+      Sys.sleep(wait_time)
+      result <- safe_assessments(..1, ..2)
+      if (is.null(result$result)) {
+        tibble(
+          genus = ..1,
+          species = ..2,
+          assessment_id = NA,
+          latest = NA,
+          scopes_code = NA,
+          status = "Not found"
+        )
+      } else {
+        result$result %>%
+          mutate(genus = ..1, species = ..2)
+      }
+    }
   )
   
-  # Filter latest global assessments
-  iucn_as_latest <- iucn_as %>%
-    filter(latest == TRUE, scopes_code == 1)
+  # Combine all results
+  iucn_as <- bind_rows(iucn_as_list)
   
-  # Download full assessment data
-  full_data <- assessment_data_many(
+  # Filter for latest global assessments only
+  iucn_as_latest <- iucn_as %>%
+    filter(!is.na(assessment_id), latest == TRUE, scopes_code == 1)
+  
+  # Safely download full assessment data
+  safe_assessment_data <- safely(assessment_data_many)
+  full_data_result <- safe_assessment_data(
     api,
     unique(iucn_as_latest$assessment_id),
     wait_time = wait_time
   )
   
-  # Extract components
+  full_data <- full_data_result$result
+  if (is.null(full_data)) full_data <- list()
+  
+  # Extract elements (if available)
   full_taxon <- extract_element(full_data, "taxon")
   full_rlc <- extract_element(full_data, "red_list_category")
   common_name <- extract_element(full_data, "taxon_common_names") %>%
@@ -39,8 +66,25 @@ get_iucn_species_data <- function(api, species_df, wait_time = 0.5) {
       Status = code,
       `Common name` = name
     )
+  
+  # Handle "not found" cases only if such column exists
+  if ("status" %in% colnames(iucn_as) && any(iucn_as$status == "Not found")) {
+    not_found_df <- iucn_as %>%
+      filter(status == "Not found") %>%
+      transmute(
+        Species = paste(genus, species),
+        Class = NA,
+        Order = NA,
+        Family = NA,
+        Status = "Not found",
+        `Common name` = NA
+      )
+    final_species_df <- bind_rows(final_species_df, not_found_df)
+  }
+  
   return(final_species_df)
 }
+
 
 # CITES 
 retrieve_CITES_data <- function(speciesList) {
